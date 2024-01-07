@@ -1,0 +1,13 @@
+{
+  "name": "vc-govern",
+  "version": "1.0.0",
+  "description": "Web5 verifiable credentials manager",
+  "main": "index.js",
+  "repository": "git@github.com:biggaji/vc-govern.git",
+  "author": "biggaji <tobiajibade2017@yandex.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@web5/api": "^0.8.3",
+    "@web5/credentials": "^0.4.1"
+  }
+}
