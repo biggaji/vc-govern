@@ -293,7 +293,7 @@
     pkarr "1.1.1"
     z32 "1.0.1"
 
-"@web5/dids@0.2.4":
+"@web5/dids@0.2.4", "@web5/dids@^0.2.4":
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/@web5/dids/-/dids-0.2.4.tgz#e4ab4924d7c73c81621b2216d39d9923a03840b5"
   integrity sha512-e+m+xgpiM8ydTJgWcPdwmjILLMZYdl2kwahlO22mK0azSKVrg1klpGrUODzqkrWrQ5O0tnOyqEy39FcD5Sy11w==
@@ -1762,6 +1762,11 @@ typed-array-length@^1.0.4:
     call-bind "^1.0.2"
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
+
+typescript@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.3.3.tgz#b3ce6ba258e72e6305ba66f5c9b452aaee3ffe37"
+  integrity sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==
 
 uint8-util@^2.1.6, uint8-util@^2.2.2:
   version "2.2.4"
