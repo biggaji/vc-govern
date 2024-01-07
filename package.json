@@ -8,6 +8,11 @@
   "license": "MIT",
   "dependencies": {
     "@web5/api": "^0.8.3",
-    "@web5/credentials": "^0.4.1"
-  }
+    "@web5/credentials": "^0.4.1",
+    "@web5/dids": "^0.2.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "type": "module"
 }
