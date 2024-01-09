@@ -12,7 +12,14 @@
     "@web5/dids": "^0.2.4"
   },
   "devDependencies": {
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.2",
     "typescript": "^5.3.3"
   },
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "compile": "tsc",
+    "compile:watch": "tsc -w",
+    "run": "node ./dist/index.js"
+  }
 }
