@@ -1,4 +1,4 @@
-import { VerifiableCredential } from '@web5/credentials';
+import { VerifiableCredential, PresentationExchange } from '@web5/credentials';
 import { Web5 } from '@web5/api';
 import { DidIonMethod, PortableDid } from '@web5/dids';
 import { config } from 'dotenv';
@@ -13,7 +13,7 @@ config();
  * Each verifiable credential has an issuer, subject and a claim.
  */
 
-// NOTE: Property 'expirationDate' is skiped for now, there is a bug preventing the creation of VC's with expiration date.
+// NOTE: Property 'expirationDate' is skipped for now, there is a bug preventing the creation of VC's with expiration date.
 type IssueVerifiableCredentialParams = {
   type?: IssuingCredentialType;
   issuer: PortableDid;
@@ -83,7 +83,7 @@ async function issueVerifiableCredential(issueVerifiableCredentialParams: IssueV
 }
 
 // Issue a VC test
-const vcred = await issueVerifiableCredential({
+const verifiableCred = await issueVerifiableCredential({
   issuer: issuerPortableDID,
   subject: subjectPortableDID,
   type: IssuingCredentialType.EmploymentCredential,
@@ -99,4 +99,22 @@ const vcred = await issueVerifiableCredential({
   },
 });
 
-console.log(vcred);
+// console.log(verifiableCred);
+
+// Parse VC JWT
+const { vcDataModel } = await VerifiableCredential.parseJwt({ vcJwt: process.env.VC_JWT! });
+const dataSubject: any = vcDataModel.credentialSubject;
+
+// console.log(dataSubject);
+
+// Verify VC_JWT
+async function verifyVcJWT(vcJwt: string) {
+  try {
+    const verificationResult = await VerifiableCredential.verify({ vcJwt: process.env.VC_JWT! });
+    return verificationResult;
+  } catch (error: any) {
+    handleError(error);
+  }
+}
+
+// console.log((await verifyVcJWT(process.env.VC_JWT!)) ? 'valid' : 'invalid');
