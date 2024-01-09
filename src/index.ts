@@ -144,3 +144,38 @@ const siloResidentVerifiableCred = await issueVerifiableCredential({
 });
 
 // console.log(siloResidentVerifiableCred);
+
+// Presentation EX
+
+// Select only matching creds
+const selecteCreds = PresentationExchange.selectCredentials({
+  presentationDefinition: siloPresentationDefinition,
+  vcJwts: [process.env.VC_JWT!, process.env.VC_JWT_SILO!],
+});
+
+// check if cred satisfies the PD
+try {
+  PresentationExchange.satisfiesPresentationDefinition({
+    presentationDefinition: siloPresentationDefinition,
+    vcJwts: selecteCreds,
+  });
+} catch (err: any) {
+  console.error('Error checking if VC satisfies PD', err.message);
+}
+
+// Create presentation
+const createPresentationResult = PresentationExchange.createPresentationFromCredentials({
+  presentationDefinition: siloPresentationDefinition,
+  vcJwts: selecteCreds,
+});
+
+// console.log(createPresentationResult);
+
+// Validate presentation submission
+const submissionCheck = PresentationExchange.validateSubmission({
+  presentationSubmission: createPresentationResult.presentationSubmission,
+});
+
+// console.log(submissionCheck);
+
+// Verify VC from presentation
