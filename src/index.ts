@@ -1,8 +1,9 @@
-import { VerifiableCredential, PresentationExchange } from '@web5/credentials';
+import { VerifiableCredential, PresentationExchange, PresentationDefinitionV2 } from '@web5/credentials';
 import { Web5 } from '@web5/api';
 import { DidIonMethod, PortableDid } from '@web5/dids';
 import { config } from 'dotenv';
 import { handleError } from './@utils/handleError.js';
+import { siloPresentationDefinition } from './presentationDefs/siloPresentationDefinition.js';
 
 // Load env(s)
 config();
@@ -25,6 +26,7 @@ enum IssuingCredentialType {
   EmploymentCredential = 'EmploymentCredential',
   EducationCredential = 'EducationCredential',
   GovermentIdentityCredential = 'GovermentIdentityCredential',
+  SiloVerificationCredential = 'SiloVerificationCredential',
 }
 
 const ISSUING_CREDENTIAL_TYPE_LIST = Array.from(Object.values(IssuingCredentialType));
@@ -118,3 +120,27 @@ async function verifyVcJWT(vcJwt: string) {
 }
 
 // console.log((await verifyVcJWT(process.env.VC_JWT!)) ? 'valid' : 'invalid');
+
+// Validate presentation definition
+const validPresentationDef = PresentationExchange.validateDefinition({
+  presentationDefinition: siloPresentationDefinition,
+});
+
+// console.log(validPresentationDef);
+
+// Silo Credential Issurance
+const siloResidentVerifiableCred = await issueVerifiableCredential({
+  issuer: issuerPortableDID,
+  subject: subjectPortableDID,
+  type: IssuingCredentialType.SiloVerificationCredential,
+  data: {
+    siloNum: 'silo0_UR001',
+    fullName: 'Tobiloba Ajibade',
+    city: 'Ibadan',
+    state: 'Oyo',
+    country: 'Nigeria',
+    joinedAt: new Date().toISOString(),
+  },
+});
+
+// console.log(siloResidentVerifiableCred);
