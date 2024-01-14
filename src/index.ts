@@ -22,6 +22,7 @@ type IssueVerifiableCredentialParams = {
   data: object;
 };
 
+// Allow users to enter type
 enum IssuingCredentialType {
   EmploymentCredential = 'EmploymentCredential',
   EducationCredential = 'EducationCredential',
@@ -157,7 +158,7 @@ const selecteCreds = PresentationExchange.selectCredentials({
 try {
   PresentationExchange.satisfiesPresentationDefinition({
     presentationDefinition: siloPresentationDefinition,
-    vcJwts: selecteCreds,
+    vcJwts: [process.env.VC_JWT!, process.env.VC_JWT_SILO!],
   });
 } catch (err: any) {
   console.error('Error checking if VC satisfies PD', err.message);
@@ -169,13 +170,35 @@ const createPresentationResult = PresentationExchange.createPresentationFromCred
   vcJwts: selecteCreds,
 });
 
-// console.log(createPresentationResult);
+console.log(createPresentationResult.presentation);
 
 // Validate presentation submission
 const submissionCheck = PresentationExchange.validateSubmission({
   presentationSubmission: createPresentationResult.presentationSubmission,
 });
 
-// console.log(submissionCheck);
+console.log(submissionCheck);
 
 // Verify VC from presentation
+for (let vc_jwt of createPresentationResult.presentation.verifiableCredential!) {
+  try {
+    const verificationResult = await VerifiableCredential.verify({ vcJwt: vc_jwt as string });
+    const vcDataModel = VerifiableCredential.parseJwt({ vcJwt: vc_jwt as string }).vcDataModel;
+    console.log({
+      valid: verificationResult !== undefined,
+      data: vcDataModel.credentialSubject,
+    });
+  } catch (error: any) {
+    console.error(`Error verifying presentation:`, error.message);
+  }
+}
+
+/**
+ * Issue VC
+ * Peform PX
+ * Select credential to preserve privacy
+ * Satisfies PD against your selected credential?
+ * Generate presentation from PD
+ * Validate presentation submission check against PD
+ * Verify presentation
+ */

@@ -1,0 +1,29 @@
+{
+  "name": "vc-govern",
+  "version": "1.0.0",
+  "description": "Web5 verifiable credentials manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web5",
+    "vc",
+    "verifiable",
+    "credentials",
+    "tbd",
+    "did",
+    "biggaji",
+    "oxwware"
+  ],
+  "author": "Tobiloba Ajibade",
+  "license": "ISC",
+  "dependencies": {
+    "@web5/credentials": "^0.4.1",
+    "@web5/dids": "^0.2.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "type": "module"
+}
