@@ -53,7 +53,7 @@ interface IVcGovern {
   verifyCredentialFromPresentation(
     presentation: any,
     includeParsedData: boolean,
-  ): Promise<CredentialVerificationResult>;
+  ): Promise<CredentialVerificationResult[]>;
 }
 
 /**
@@ -88,12 +88,12 @@ export const vcGovern: IVcGovern = {
       // Sign newly created verifiable credential with the issuer portableDID
       return await credential.sign({ did: issuer })!;
     } catch (error: any) {
-      console.error('Error issuing a verifiable credential', error.message);
+      console.error('Error issuing a verifiable credential:', error.message);
       throw error;
     }
   },
 
-  async generatePresentation(presentationDefinition, vcJwts) {
+  generatePresentation(presentationDefinition, vcJwts) {
     try {
       if (!presentationDefinition) {
         throw new Error("The 'presentation definition' provided by the verifier is required");
@@ -120,7 +120,7 @@ export const vcGovern: IVcGovern = {
 
       return presentation;
     } catch (error: any) {
-      console.error('Error generating presentation from presentation definition', error.message);
+      console.error('Error generating presentation from presentation definition:', error.message);
       throw error;
     }
   },
@@ -135,23 +135,48 @@ export const vcGovern: IVcGovern = {
         }),
       };
     } catch (error: any) {
-      console.error('Error verifing a verifiable credential jwt', error.message);
+      console.error('Error verifing a verifiable credential jwt:', error.message);
       throw error;
     }
   },
 
   async verifyCredentialFromPresentation(presentation, includeParsedData) {
     try {
-      // Evaluate presentation submission
+      const verificationResultList: CredentialVerificationResult[] = [];
+
+      // Validate submitted presentation before starting verification process
+      const presentationSubmissionCheck: any = PresentationExchange.validateSubmission({
+        presentationSubmission: presentation.presentationSubmission,
+      });
+
+      const presentationSubmissionAssertionCheckResult = presentationSubmissionCheck.filter(
+        (presentation: any) => {
+          return presentation.status !== 'info';
+        },
+      );
+
+      if (presentationSubmissionAssertionCheckResult.length) {
+        throw new Error('The submitted presentation is not valid');
+      }
+
+      const vcJwts = presentation.presentation.verifiableCredential!;
+
+      if (!vcJwts.length) {
+        throw new Error('No verifiable credential is found within the submitted presentation');
+      }
 
       // Loop through vc jwts and verify them individually
+      for (let vcJwt of vcJwts) {
+        const verificationResult = await VerifiableCredential.verify({ vcJwt });
+        verificationResultList.push({
+          valid: verificationResult !== undefined,
+          ...(includeParsedData && { data: verificationResult.vc.credentialSubject }),
+        });
+      }
 
-      return {
-        valid: true,
-        data: {},
-      };
+      return verificationResultList;
     } catch (error: any) {
-      console.error('Error verifing a verifiable credential jwt from presentation', error.message);
+      console.error('Error verifing a verifiable credential jwt from presentation:', error.message);
       throw error;
     }
   },
