@@ -16,7 +16,7 @@ type CredentialVerificationResult = {
 
 interface IVcGovern {
   /**
-   * Issues a verifiable credential (VC) to a subject or entity
+   * Issues a verifiable credential (VC) to a subject
    * @method issueVerifiableCredential
    * @param issueVerifiableCredentialParams
    * @returns {string} A signed jwt token representing the created verifiable credential
@@ -26,16 +26,16 @@ interface IVcGovern {
   ): Promise<string | undefined>;
 
   /**
-   * Generates a presentation from a presentation defination by performing a presentation exchange (PEX)
+   * Generates a presentation from a presentation definition by performing a presentation exchange (PEX)
    * @method generatePresentation
    * @param presentationDefinition
    * @param vcJwts
-   * @returns A presentation in a JSON format
+   * @returns A presentation
    */
   generatePresentation(presentationDefinition: PresentationDefinitionV2, vcJwts: string[]): any;
 
   /**
-   * Verify a sign verifiable credential jwt
+   * Verify a signed verifiable credential jwt
    * @method verifyCredential
    * @param vcJwt
    * @param includeParsedData
@@ -44,7 +44,7 @@ interface IVcGovern {
   verifyCredential(vcJwt: string, includeParsedData: boolean): Promise<CredentialVerificationResult>;
 
   /**
-   * Verifies credentials within a presentation
+   * Verifies signed verifiable credentials within a presentation
    * @method verifyCredentialFromPresentation
    * @param presentation
    * @param includeParsedData
@@ -95,6 +95,30 @@ export const vcGovern: IVcGovern = {
 
   async generatePresentation(presentationDefinition, vcJwts) {
     try {
+      if (!presentationDefinition) {
+        throw new Error("The 'presentation definition' provided by the verifier is required");
+      }
+
+      if (!vcJwts || vcJwts.length === 0) {
+        throw new Error("Provide at least 1 'vcJwt'");
+      }
+
+      // To preserve user privacy, select credentials that matches the presentation definition requirements
+      const selectedVcJwts = PresentationExchange.selectCredentials({ vcJwts, presentationDefinition });
+
+      // Ensure that selected credentials collectively satisfies all the presentation definition requirements
+      PresentationExchange.satisfiesPresentationDefinition({
+        presentationDefinition,
+        vcJwts: selectedVcJwts,
+      });
+
+      // Generate presentation from the selected verifiable credentials using the presentation definition
+      const presentation = PresentationExchange.createPresentationFromCredentials({
+        presentationDefinition,
+        vcJwts: selectedVcJwts,
+      });
+
+      return presentation;
     } catch (error: any) {
       console.error('Error generating presentation from presentation definition', error.message);
       throw error;
