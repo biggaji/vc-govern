@@ -1,3 +1,9 @@
+/*!
+ * vcGovern
+ * Copyright(c) 2024 Tobi Ajibade
+ * MIT Licensed
+ */
+
 import { PresentationDefinitionV2, PresentationExchange, VerifiableCredential } from '@web5/credentials';
 import { PortableDid } from '@web5/dids';
 
@@ -162,7 +168,7 @@ export const vcGovern: IVcGovern = {
       const vcJwts = presentation.presentation.verifiableCredential!;
 
       if (!vcJwts.length) {
-        throw new Error('No verifiable credential is found within the submitted presentation');
+        throw new Error('No verifiable credential found within the submitted presentation');
       }
 
       // Loop through vc jwts and verify them individually
